@@ -292,7 +292,7 @@ void io_context::try_submit(detail::submit_info &info) noexcept {
     if (is_sqe(info.sqe)) [[likely]] {
         // submit to ring
         log::v("ctx ring.submit()...\n");
-        // ++requests_to_reap;
+        ++requests_to_reap;
         need_ring_submit = true;
         ring.appendSQEntry(info.sqe);
         auto *const victim_sqe = ring.getSQEntry();
@@ -416,7 +416,7 @@ inline void io_context::poll_completion() noexcept {
     const liburingcxx::CQEntry *const polling_cqe = ring.peekCQEntry();
     if (polling_cqe == nullptr) return;
 
-    // --requests_to_reap;
+    --requests_to_reap;
     log::v("ctx poll_completion found\n");
 
     const uint64_t user_data = polling_cqe->getData();
@@ -549,7 +549,7 @@ void io_context::co_spawn(main_task entrance) {
             // }
 
             if constexpr (!config::use_standalone_completion_poller)
-                poll_completion();
+                while (requests_to_reap != 0) poll_completion();
             // if (try_clear_reap_overflow_buf()) {
             // while (requests_to_reap != 0) {
             // for (uint8_t i = 0; i < config::reap_poll_rounds; ++i) {
