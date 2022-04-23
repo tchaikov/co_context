@@ -86,9 +86,9 @@ namespace config {
 
     // inline constexpr uint16_t swap_capacity = 32;
 
-    inline constexpr uint16_t swap_capacity = 16;
+    // inline constexpr uint16_t swap_capacity = 16;
 
-    // inline constexpr uint16_t swap_capacity = 8;
+    inline constexpr uint16_t swap_capacity = 8;
 
     // static_assert(swap_capacity % 8 == 0);
 
